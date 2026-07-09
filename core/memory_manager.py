@@ -6,9 +6,9 @@ class MemoryBlock:
         self.is_free = True
         self.process_id = None
 
-        def __repr__(self):
-            status = "Libre" if self.is_free else f"Ocupado por proceso {self.process_id}"
-            return f"[Bloque {self.block_id} | Comienza: {self.start_address} | Tamaño: {self.size} | Estado: {status}]"
+    def __repr__(self):
+        status = "Libre" if self.is_free else f"Ocupado por proceso {self.process_id}"
+        return f"[Bloque {self.block_id} | Comienza: {self.start_address} | Tamaño: {self.size} | Estado: {status}]"
 
 class MemoryManager:
     def __init__(self, total_size):

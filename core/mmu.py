@@ -9,18 +9,21 @@ class MMU:
         self.physical_memory_size = physical_memory_size
         self.page_size = page_size
 
-        self.total_frames = physical_memory_size
+        self.total_frames = physical_memory_size // page_size
 
         self.available_frames = [True] * self.total_frames
 
         self.page_tables = {}
+
+    def available_frames_count(self):
+        return sum(self.available_frames)
     
     def create_page_table(self, process_id, virtual_memory_size):
-        num_pages = virtual_memory_size
+        num_pages = virtual_memory_size // self.page_size
         if virtual_memory_size % self.page_size != 0:
             num_pages += 1
 
-        free_frames_count = self.available_frames_count(True)
+        free_frames_count = self.available_frames_count()
 
         if num_pages > free_frames_count:
             return False, f"Error: No hay suficientes marcos físicos disponibles. Se requieren {num_pages} marcos."
