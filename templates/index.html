@@ -111,6 +111,10 @@
                     <strong>Dirección fisica real:</strong> <span id="res-paddr"></span>
                 </p>
             </div>
+            
+            <div id="mmu-fragmentation" class="hidden bg-yellow-50 border border-yellow-200 p-3 rounded text-sm text-yellow-900 mt-4">
+                <strong>Fragmentación interna total:</strong> <span id="res-internal-frag"></span> bytes
+            </div>
         </section>
     </main>
 
@@ -204,6 +208,8 @@
             });
             const data = await response.json();
             showMessage('mmu-message', data.message, data.status === "success");
+
+            fetchInternalFragmentation();
         }
 
         async function translateAddress() {
@@ -231,6 +237,15 @@
                 showMessage('mmu-message', data.message, false);
                 resDiv.classList.add('hidden');
             }
+        }
+
+        async function fetchInternalFragmentation() {
+            const response = await fetch('/mmu/fragmentation');
+            const data = await response.json();
+
+            const fragDiv = document.getElementById('mmu-fragmentation');
+            fragDiv.classList.remove('hidden');
+            document.getElementById('res-internal-frag').innerText = data.total_internal_fragmentation;
         }
 
         // cargar el estado inicial de la barra de memoria al abrir la página

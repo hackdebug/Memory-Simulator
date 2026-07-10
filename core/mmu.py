@@ -14,6 +14,7 @@ class MMU:
         self.available_frames = [True] * self.total_frames
 
         self.page_tables = {}
+        self.process_virtual_sizes = {}
 
     def available_frames_count(self):
         return sum(self.available_frames)
@@ -42,7 +43,36 @@ class MMU:
             page_table.append(entry)
 
         self.page_tables[process_id] = page_table
-        return True, f"Tabla de páginas creada con éxito. Proceso asignado a {num_pages} marcos."
+        self.process_virtual_sizes[process_id] = virtual_memory_size
+
+        internal_frag = (num_pages * self.page_size) - virtual_memory_size
+        return True, (f"Tabla de páginas creada con éxito. Proceso asignado a {num_pages} marcos."
+                       f"Fragmentación interna: {internal_frag} bytes.")
+    
+    def calculate_internal_fragmentation(self, process_id):
+        """Retorna la fragmentación interna (bytes desperdiciados) de un proceso específico."""
+        if process_id not in self.page_tables:
+            return None
+        num_pages = len(self.page_tables[process_id])
+        virtual_size = self.process_virtual_sizes[process_id]
+        return (num_pages * self.page_size) - virtual_size
+    
+    def calculate_total_internal_fragmentation(self):
+        """Retorna la fragmentación interna total sumando todos los procesos activos."""
+        total = 0
+        for process_id in self.page_tables:
+            total += self.calculate_internal_fragmentation(process_id)
+        return total
+    
+    def remove_process_pages(self, process_id):
+        if process_id in self.page_tables:
+            for entry in self.page_tables[process_id]:
+                if entry.is_valid:
+                    self.available_frames[entry.frame_number] = True
+            del self.page_tables[process_id]
+            self.process_virtual_sizes.pop(process_id, None)
+            return True
+        return False
     
     def translate_address(self, process_id, virtual_address):
         if process_id not in self.page_tables:

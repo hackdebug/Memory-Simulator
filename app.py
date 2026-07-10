@@ -78,5 +78,10 @@ def mmu_translate():
     result = mmu_manager.translate_address(process_id, virtual_address)
     return jsonify(result)
 
+@app.route('/mmu/fragmentation', methods=['GET'])
+def mmu_fragmentation():
+    total = mmu_manager.calculate_total_internal_fragmentation()
+    return jsonify({"total_internal_fragmentation": total})
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
